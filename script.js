@@ -320,7 +320,7 @@ async function handleGenerateSubmit(event) {
     } catch (error) {
         clearInterval(interval);
         console.error("Error connecting to backend:", error);
-        alert("Failed to connect to the backend server. Please try again.");
+        alert("Failed to connect to the backend server. Make sure backend.py is running on port 5000.");
         closeGenerateModal();
     }
 }
@@ -344,10 +344,15 @@ function downloadMockPaper() {
     currentMarks = actualMarks.toString();
 
     try {
+        console.log("Attempting PDF generation...");
+        if (!window.jspdf) {
+            throw new Error("jsPDF library not loaded. Check your internet connection.");
+        }
+        
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         
-        // Add content to PDF
+        console.log("jsPDF instance created.");
         doc.setFont("helvetica", "bold");
         doc.setFontSize(22);
         doc.setTextColor(109, 40, 217); // Primary color
@@ -445,8 +450,8 @@ function downloadMockPaper() {
         // Trigger download
         doc.save(`EduAI_${currentSubject.replace(/\s+/g, '_')}_Paper.pdf`);
     } catch (e) {
-        console.error("PDF Generation failed:", e);
-        alert("Failed to generate PDF. Make sure you are connected to the internet to load the PDF library.");
+        console.error("Detailed PDF Generation Error:", e);
+        alert("Failed to generate PDF. Error: " + e.message + "\nCheck the console for more details.");
     }
     
     // Do not close preview modal automatically so user can keep editing if desired
@@ -558,8 +563,8 @@ async function replaceQuestion(sectionKey, index, type) {
     const pyqsInput = document.getElementById('pyqs');
     if (pyqsInput.files.length > 0) formData.append('pyqs', pyqsInput.files[0]);
 
-   try {
-        const response = await fetch('/replace', {
+    try {
+        const response = await fetch('http://localhost:5000/replace', {
             method: 'POST',
             body: formData
         });
@@ -587,6 +592,11 @@ function downloadAnswerKey() {
     }
 
     try {
+        console.log("Attempting Answer Key PDF generation...");
+        if (!window.jspdf) {
+            throw new Error("jsPDF library not loaded. Check your internet connection.");
+        }
+
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         
@@ -644,8 +654,8 @@ function downloadAnswerKey() {
         
         doc.save(`EduAI_${currentSubject.replace(/\s+/g, '_')}_AnswerKey.pdf`);
     } catch (e) {
-        console.error("Answer Key Generation failed:", e);
-        alert("Failed to generate PDF. Make sure you are connected to the internet to load the PDF library.");
+        console.error("Detailed Answer Key PDF Error:", e);
+        alert("Failed to generate Answer Key PDF. Error: " + e.message);
     }
 }
 

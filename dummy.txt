@@ -1,0 +1,5 @@
+This is a dummy syllabus for testing purposes.
+Topic 1: Introduction to AI.
+Topic 2: Question Paper Generation.
+Topic 3: PDF Export.
+Topic 4: Zero Repetition Engine.
