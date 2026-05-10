@@ -558,8 +558,8 @@ async function replaceQuestion(sectionKey, index, type) {
     const pyqsInput = document.getElementById('pyqs');
     if (pyqsInput.files.length > 0) formData.append('pyqs', pyqsInput.files[0]);
 
-    try {
-        const response = await fetch('http://localhost:5000/replace', {
+   try {
+        const response = await fetch('/replace', {
             method: 'POST',
             body: formData
         });
