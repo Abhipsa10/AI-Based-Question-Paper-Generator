@@ -320,7 +320,7 @@ async function handleGenerateSubmit(event) {
     } catch (error) {
         clearInterval(interval);
         console.error("Error connecting to backend:", error);
-        alert("Failed to connect to the backend server. Make sure backend.py is running on port 5000.");
+        alert("Failed to connect to the backend server. Please try again.");
         closeGenerateModal();
     }
 }
