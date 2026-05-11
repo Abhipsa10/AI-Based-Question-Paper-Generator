@@ -89,24 +89,22 @@ def generate_paper():
                 print(f"   WARNING: Unsupported PYQ format ({pyqs_file.filename}). Use PDF or TXT.")
             print(f"   Extracted {len(pyqs_text)} characters from PYQs.")
 
-    # Allowing much larger text context for full syllabus and PYQs reading
-    # LLaMA 3.3 70B versatile supports up to 128k tokens, so ~200k chars is safe.
-    syllabus_text = syllabus_text[:200000]
-    pyqs_text = pyqs_text[:200000]
+    # Increased limit to 500k chars to capture more PDF content
+    syllabus_text = syllabus_text[:500000]
+    pyqs_text = pyqs_text[:500000]
 
     prompt = f"""
     You are an expert academic AI assistant tasked with generating a high-quality college-level question paper.
     
     CRITICAL CONSTRAINTS:
-    1. Use ONLY the content inside the uploaded syllabus and PYQ PDFs for ALL question types (MCQ, short, long).
-    2. Long questions MUST also come directly from the uploaded files' concepts, topics, explanations, formulas, and derivations.
-    3. You are NOT allowed to create or imagine any generic or easy questions.
-    4. This is a COLLEGE-LEVEL exam, so long questions must be technical, detailed, and syllabus-based.
-    5. If any topic or concept is NOT found in the PDF, do NOT make a question from it.
+    1. PRIORITIZE the content inside the uploaded syllabus and PYQ PDFs for ALL question types.
+    2. Long questions should be technical, detailed, and based on the concepts found in the uploaded files.
+    3. You are NOT allowed to imagine any generic or oversimplified questions.
+    4. This is a COLLEGE-LEVEL exam.
+    5. If a topic is mentioned in the PDF but the details are sparse, you MAY use your expert academic knowledge to supplement and create high-quality, relevant technical questions.
     6. Maintain the selected difficulty level ({difficulty}) for ALL sections.
-    7. If the long-question content is insufficient inside the PDFs, ask for more files by returning {{"error": "Insufficient content. Please upload more files instead of generating childish questions."}} instead of generating fake questions.
-    8. Avoid repeating previous PYQs.
-    9. Generate AS MANY valid questions as possible based ONLY on the provided material, guided by the Exam Type below. Just return the JSON with whatever number of valid questions you could extract.
+    7. Avoid repeating previous PYQs.
+    8. Generate as many valid questions as possible to fulfill the Exam Type requirements.
     
     Requirements:
     - Subject: {subject}
@@ -208,8 +206,8 @@ def replace_question():
             elif pyqs_file.filename.lower().endswith('.txt'):
                 pyqs_text = pyqs_file.read().decode('utf-8', errors='ignore')
 
-    syllabus_text = syllabus_text[:200000]
-    pyqs_text = pyqs_text[:200000]
+    syllabus_text = syllabus_text[:500000]
+    pyqs_text = pyqs_text[:500000]
 
     prompt = f"""
     You are an expert academic AI assistant. You need to generate a SINGLE replacement question for a college-level exam.
@@ -222,9 +220,9 @@ def replace_question():
     - Marks: {marks}
     
     CRITICAL CONSTRAINTS:
-    1. Use ONLY the content inside the uploaded syllabus and PYQ PDFs.
-    2. Do NOT create or imagine generic questions.
-    3. If content is insufficient, return an error.
+    1. PRIORITIZE the content inside the uploaded syllabus and PYQ PDFs.
+    2. Do NOT create or imagine oversimplified questions.
+    3. If a topic is in the PDF, you may use expert academic knowledge to ensure the question is technical and college-level.
     
     Syllabus Content:
     {syllabus_text if syllabus_text else 'No specific syllabus provided.'}
