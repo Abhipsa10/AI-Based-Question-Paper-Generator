@@ -24,6 +24,18 @@ def serve_static(path):
 # Initialize Groq client
 client = Groq(api_key=os.environ.get("GROQ_API_KEY", ""))
 
+def clean_json_response(content):
+    """
+    Cleans the AI response by removing markdown code blocks if present.
+    """
+    content = content.strip()
+    if content.startswith("```"):
+        # Remove starting ```json or ```
+        content = content.split("\n", 1)[-1]
+        if content.endswith("```"):
+            content = content.rsplit("```", 1)[0]
+    return content.strip()
+
 def extract_text_from_pdf(file_obj):
     text = ""
     try:
@@ -152,7 +164,8 @@ def generate_paper():
         )
         
         response_content = chat_completion.choices[0].message.content
-        data = json.loads(response_content)
+        cleaned_content = clean_json_response(response_content)
+        data = json.loads(cleaned_content)
         
         if "error" in data:
             return jsonify({"error": data["error"]}), 400
@@ -251,7 +264,8 @@ def replace_question():
         )
         
         response_content = chat_completion.choices[0].message.content
-        data = json.loads(response_content)
+        cleaned_content = clean_json_response(response_content)
+        data = json.loads(cleaned_content)
         
         if "error" in data:
             return jsonify({"error": data["error"]}), 400
@@ -265,5 +279,6 @@ def replace_question():
 if __name__ == '__main__':
     app.run(
         host="0.0.0.0",
-        port=int(os.environ.get("PORT", 5000))
+        port=int(os.environ.get("PORT", 5000)),
+        debug=True
     )
